@@ -1,36 +1,38 @@
 const fs = require("fs");
 function createAndDeleteTheDirectory(mkdirPath, n, callback) {
+  if (n == 0) {
+    console.log("sucessfully all files are deleted");
+    return;
+  }
+
   fs.mkdir(mkdirPath, { recursive: true }, (err) => {
     if (err) {
       callback(err);
       return;
     } else {
-      while (n > 0) {
-        createJsonFile(`./jsonDirectory/${n}.json`, (err, filePath) => {
-          if (err) {
-            console.log(err);
-            callback(err);
-          } else {
-            console.log(`filepath is ${filePath} is createdSuccessfully`);
-            deleteFiles(filePath, (err) => {
-              if (err) {
-                console.log(err);
-                callback(err);
-              } else {
-                console.log(`filePath is ${filePath} is deleted suceesfully`);
-              }
-            });
-          }
-        });
-        n--;
-      }
+      createJsonFile(`./jsonDirectory/${n}.json`, (err, filePath) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(`filepath is ${filePath} is createdSuccessfully`);
+          deleteFiles(filePath, (err) => {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log(`filePath is ${filePath} is deleted suceesfully`);
+              createAndDeleteTheDirectory(mkdirPath, --n, callback);
+            }
+          });
+        }
+      });
+      callback(null);
     }
   });
 }
 
-function deleteFiles(mkdirPath, callback) {
+function deleteFiles(filePath, callback) {
   setTimeout(() => {
-    fs.unlink(mkdirPath, (err) => {
+    fs.unlink(filePath, (err) => {
       if (err) {
         callback(err);
         return;
